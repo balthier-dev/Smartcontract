@@ -28,30 +28,30 @@ interface RANDOM_CONTRACT {
 
 interface RANDOM_RATE {
     function getGenPool(
-        uint256 _nftType,
-        uint256 _rarity,
-        uint256 _number
-    ) external view returns (uint256);
+        uint16 _nftType,
+        uint16 _rarity,
+        uint16 _number
+    ) external view returns (uint16);
 
-    function getNFTPool(uint256 _nftType, uint256 _number)
+    function getNFTPool(uint16 _nftType, uint16 _number)
         external
         view
-        returns (uint256);
+        returns (uint16);
 
-    function getEquipmentPool(uint256 _number) external view returns (uint256);
+    function getEquipmentPool(uint16 _number) external view returns (uint16);
 
     function getBlueprintPool(
-        uint256 _nftType,
-        uint256 _rarity,
-        uint256 eTypeId,
-        uint256 _number
-    ) external view returns (uint256);
+        uint16 _nftType,
+        uint16 _rarity,
+        uint16 eTypeId,
+        uint16 _number
+    ) external view returns (uint16);
 
     function getSpaceWarriorPool(
-        uint256 _part,
-        uint256 _nftType,
-        uint256 _number
-    ) external view returns (uint256);
+        uint16 _part,
+        uint16 _nftType,
+        uint16 _number
+    ) external view returns (uint16);
 }
 
 contract BoxRedemption is Ownable {
@@ -115,7 +115,7 @@ contract BoxRedemption is Ownable {
 
     function burnAndMint(
         ERC1155_CONTRACT _token,
-        uint256 _id
+        uint16 _id
     ) internal {
         uint256 _randomNumber = RANDOM_CONTRACT(randomWorkerContract)
             .startRandom();
@@ -127,7 +127,7 @@ contract BoxRedemption is Ownable {
         emit OpenBox(msg.sender, _id, _partCode);
     }
 
-    function openBox(uint256 _id) public {
+    function openBox(uint16 _id) public {
         ERC1155_CONTRACT _token = ERC1155_CONTRACT(mysteryBoxContract);
         uint256 _balance = _token.balanceOf(msg.sender, _id);
         require(_balance >= 1, "Your balance is insufficient.");
@@ -140,13 +140,13 @@ contract BoxRedemption is Ownable {
     }
 
     function createGenomic(
-        uint256 _id,
-        uint256 _nftTypeCode,
-        uint256 _number,
-        uint256 _rarity
+        uint16 _id,
+        uint16 _nftTypeCode,
+        uint16 _number,
+        uint16 _rarity
     ) private view returns (string memory) {
         //uint256 genomicType = GenPool[_id][_rarity][_number];
-        uint256 genomicType = randomRate.getGenPool(_id, _rarity, _number);
+        uint16 genomicType = randomRate.getGenPool(_id, _rarity, _number);
         return
             createPartCode(
                 0,
@@ -163,18 +163,18 @@ contract BoxRedemption is Ownable {
             );
     }
 
-    function createNFTCode(uint256 _randomNumber, uint256 _nftType)
+    function createNFTCode(uint256 _randomNumber, uint16 _nftType)
         internal
         view
         returns (string memory)
     {
         string memory partCode;
-        uint256 randomNumberForNFTType = getNumberAndMod(_randomNumber, 1, 1000);
-        uint256 nftTypeCode = randomRate.getNFTPool(_nftType, randomNumberForNFTType);
+        uint16 randomNumberForNFTType = getNumberAndMod(_randomNumber, 1, 1000);
+        uint16 nftTypeCode = randomRate.getNFTPool(_nftType, randomNumberForNFTType);
 
-        uint256 equipmentRandom = getNumberAndMod(_randomNumber, 2, 5);
-        uint256 index = getNumberAndMod(_randomNumber, 3, 1000);
-        uint256 eTypeId = randomRate.getEquipmentPool(equipmentRandom);
+        uint16 equipmentRandom = getNumberAndMod(_randomNumber, 2, 5);
+        uint16 index = getNumberAndMod(_randomNumber, 3, 1000);
+        uint16 eTypeId = randomRate.getEquipmentPool(equipmentRandom);
         
         if (nftTypeCode == GENOMIC_COMMON) { //GENOMIC_COMMON
             partCode = createGenomic(_nftType, nftTypeCode, index, COMMON);
@@ -186,7 +186,7 @@ contract BoxRedemption is Ownable {
             partCode = createGenomic(_nftType, nftTypeCode, index, EPIC);
 
         } else if (nftTypeCode == BLUEPRINT_COMM) { //BLUEPRINT_COMM
-            uint256 ePartId = randomRate.getBlueprintPool(
+            uint16 ePartId = randomRate.getBlueprintPool(
                 _nftType,
                 COMMON,
                 eTypeId,
@@ -195,7 +195,7 @@ contract BoxRedemption is Ownable {
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
             
         } else if (nftTypeCode == BLUEPRINT_RARE) { //BLUEPRINT_RARE
-            uint256 ePartId = randomRate.getBlueprintPool(
+            uint16 ePartId = randomRate.getBlueprintPool(
                 _nftType,
                 RARE,
                 eTypeId,
@@ -204,7 +204,7 @@ contract BoxRedemption is Ownable {
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
 
         } else if (nftTypeCode == BLUEPRINT_EPIC) { //BLUEPRINT_EPIC
-            uint256 ePartId = randomRate.getBlueprintPool(
+            uint16 ePartId = randomRate.getBlueprintPool(
                 _nftType,
                 EPIC,
                 eTypeId,
@@ -221,43 +221,43 @@ contract BoxRedemption is Ownable {
 
     function getNumberAndMod(
         uint256 _ranNum,
-        uint256 digit,
-        uint256 mod
-    ) public view virtual returns (uint256) {
+        uint16 digit,
+        uint16 mod
+    ) public view virtual returns (uint16) {
         if (digit == 1) {
-            return (_ranNum % 10000) % mod;
+            return uint16((_ranNum % 10000) % mod);
         } else if (digit == 2) {
-            return ((_ranNum % 100000000) / 10000) % mod;
+            return uint16(((_ranNum % 100000000) / 10000) % mod);
         } else if (digit == 3) {
-            return ((_ranNum % 1000000000000) / 100000000) % mod;
+            return uint16(((_ranNum % 1000000000000) / 100000000) % mod);
         } else if (digit == 4) {
-            return ((_ranNum % 10000000000000000) / 1000000000000) % mod;
+            return uint16(((_ranNum % 10000000000000000) / 1000000000000) % mod);
         } else if (digit == 5) {
-            return ((_ranNum % 100000000000000000000) / 10000000000000000) % mod;
+            return uint16(((_ranNum % 100000000000000000000) / 10000000000000000) % mod);
         } else if (digit == 6) {
-            return ((_ranNum % 1000000000000000000000000) / 100000000000000000000) % mod;
+            return uint16(((_ranNum % 1000000000000000000000000) / 100000000000000000000) % mod);
         } else if (digit == 7) {
-            return ((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000) % mod;
+            return uint16(((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000) % mod);
         } else if (digit == 8) {
-            return ((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000) % mod;
+            return uint16(((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000) % mod);
         }
 
         return 0;
     }
     
-    function createSW(uint256 _randomNumber, uint256 _nftType)
+    function createSW(uint256 _randomNumber, uint16 _nftType)
         private
         view
         returns (string memory)
     {
       
-        uint256 trainingId = getNumberAndMod(_randomNumber, 2, 1000);
-        uint256 battleGearId = getNumberAndMod(_randomNumber, 3, 1000);
-        uint256 battleDroneId  = getNumberAndMod(_randomNumber, 4, 1000);
-        uint256 battleSuiteId = getNumberAndMod(_randomNumber, 5, 1000);
-        uint256 battleBotId = getNumberAndMod(_randomNumber, 6, 1000);
-        uint256 humanGenomeId = getNumberAndMod(_randomNumber, 7, 1000);
-        uint256 weaponId = getNumberAndMod(_randomNumber, 8, 1000);
+        uint16 trainingId = getNumberAndMod(_randomNumber, 2, 1000);
+        uint16 battleGearId = getNumberAndMod(_randomNumber, 3, 1000);
+        uint16 battleDroneId  = getNumberAndMod(_randomNumber, 4, 1000);
+        uint16 battleSuiteId = getNumberAndMod(_randomNumber, 5, 1000);
+        uint16 battleBotId = getNumberAndMod(_randomNumber, 6, 1000);
+        uint16 humanGenomeId = getNumberAndMod(_randomNumber, 7, 1000);
+        uint16 weaponId = getNumberAndMod(_randomNumber, 8, 1000);
        
         string memory concatedCode = convertCodeToStr(6);
         concatedCode = concateCode(concatedCode, 0); //kingdomCode
@@ -297,9 +297,9 @@ contract BoxRedemption is Ownable {
     }
 
     function createBlueprintPartCode(
-        uint256 nftTypeCode,
-        uint256 equipmentTypeId,
-        uint256 equipmentPartId
+        uint16 nftTypeCode,
+        uint16 equipmentTypeId,
+        uint16 equipmentPartId
     ) private pure returns (string memory) {
         string memory partCode;
 
@@ -384,17 +384,17 @@ contract BoxRedemption is Ownable {
     }
 
     function createPartCode(
-        uint256 equipmentCode,
-        uint256 starCode,
-        uint256 weapCode,
-        uint256 humanGENCode,
-        uint256 battleBotCode,
-        uint256 battleSuiteCode,
-        uint256 battleDROCode,
-        uint256 battleGearCode,
-        uint256 trainingCode,
-        uint256 kingdomCode,
-        uint256 nftTypeCode
+        uint16 equipmentCode,
+        uint16 starCode,
+        uint16 weapCode,
+        uint16 humanGENCode,
+        uint16 battleBotCode,
+        uint16 battleSuiteCode,
+        uint16 battleDROCode,
+        uint16 battleGearCode,
+        uint16 trainingCode,
+        uint16 kingdomCode,
+        uint16 nftTypeCode
     ) internal pure returns (string memory) {
         string memory code = convertCodeToStr(nftTypeCode);
         code = concateCode(code, kingdomCode);

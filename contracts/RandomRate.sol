@@ -6,46 +6,45 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract RandomRate is Ownable {
     using Strings for string;
-    using SafeMath for uint256;
-    uint256 private constant NFT_TYPE = 0; //Kingdom
-    uint256 private constant KINGDOM = 1; //Kingdom
-    uint256 private constant TRANING_CAMP = 2; //Training Camp
-    uint256 private constant GEAR = 3; //Battle Gear
-    uint256 private constant DRO = 4; //Battle DRO
-    uint256 private constant SUITE = 5; //Battle Suit
-    uint256 private constant BOT = 6; //Battle Bot
-    uint256 private constant GEN = 7; //Human GEN
-    uint256 private constant WEAP = 8; //WEAP
-    uint256 private constant COMBAT_RANKS = 9; //Combat Ranks
-    uint256 private constant BLUEPRINT_COMM = 0;
-    uint256 private constant BLUEPRINT_RARE = 1;
-    uint256 private constant BLUEPRINT_EPIC = 2;
-    uint256 private constant GENOMIC_COMMON = 3;
-    uint256 private constant GENOMIC_RARE = 4;
-    uint256 private constant GENOMIC_EPIC = 5;
-    uint256 private constant SPACE_WARRIOR = 6;
-    uint256 private constant COMMON_BOX = 0;
-    uint256 private constant RARE_BOX = 1;
-    uint256 private constant EPIC_BOX = 2;
-    uint256 private constant SPECIAL_BOX = 3;
-    uint256 private constant COMMON = 0;
-    uint256 private constant RARE = 1;
-    uint256 private constant EPIC = 2;
+    uint16 private constant NFT_TYPE = 0; //Kingdom
+    uint16 private constant KINGDOM = 1; //Kingdom
+    uint16 private constant TRANING_CAMP = 2; //Training Camp
+    uint16 private constant GEAR = 3; //Battle Gear
+    uint16 private constant DRO = 4; //Battle DRO
+    uint16 private constant SUITE = 5; //Battle Suit
+    uint16 private constant BOT = 6; //Battle Bot
+    uint16 private constant GEN = 7; //Human GEN
+    uint16 private constant WEAP = 8; //WEAP
+    uint16 private constant COMBAT_RANKS = 9; //Combat Ranks
+    uint16 private constant BLUEPRINT_COMM = 0;
+    uint16 private constant BLUEPRINT_RARE = 1;
+    uint16 private constant BLUEPRINT_EPIC = 2;
+    uint16 private constant GENOMIC_COMMON = 3;
+    uint16 private constant GENOMIC_RARE = 4;
+    uint16 private constant GENOMIC_EPIC = 5;
+    uint16 private constant SPACE_WARRIOR = 6;
+    uint16 private constant COMMON_BOX = 0;
+    uint16 private constant RARE_BOX = 1;
+    uint16 private constant EPIC_BOX = 2;
+    uint16 private constant SPECIAL_BOX = 3;
+    uint16 private constant COMMON = 0;
+    uint16 private constant RARE = 1;
+    uint16 private constant EPIC = 2;
 
     //EPool
-    mapping(uint256 => uint256) public EPool;
+    mapping(uint16 => uint16) public EPool;
 
-    mapping(uint256 => uint256[]) rateResults;
-    mapping(uint256 => uint256[]) percentage;
+    mapping(uint16 => uint16[]) rateResults;
+    mapping(uint16 => uint256[]) percentage;
 
-    mapping(uint256 => mapping(uint256 => uint256[])) GenPoolPercentage;
-    mapping(uint256 => mapping(uint256 => uint256[])) GenPoolResults;
+    mapping(uint16 => mapping(uint16 => uint256[])) GenPoolPercentage;
+    mapping(uint16 => mapping(uint16 => uint16[])) GenPoolResults;
 
-    mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256[]))) BPPoolPercentage;
-    mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256[]))) BPPoolResults;
+    mapping(uint16 => mapping(uint16 => mapping(uint16 => uint256[]))) BPPoolPercentage;
+    mapping(uint16 => mapping(uint16 => mapping(uint16 => uint16[]))) BPPoolResults;
 
-    mapping(uint256 => mapping(uint256 => uint256[])) SWPoolResults;
-    mapping(uint256 => mapping(uint256 => uint256[])) SWPoolPercentage;
+    mapping(uint16 => mapping(uint16 => uint16[])) SWPoolResults;
+    mapping(uint16 => mapping(uint16 => uint256[])) SWPoolPercentage;
 
     function initial() public onlyOwner {
         EPool[0] = GEAR; //Battle Gear
@@ -867,36 +866,36 @@ contract RandomRate is Ownable {
     }
 
     function getGenPool(
-        uint256 _nftType,
-        uint256 _rarity,
-        uint256 _number
-    ) public view returns (uint256) {
-        uint256 amount = 1000;
-        uint256 index = 0;
-        uint256 count = 0;
+        uint16 _nftType,
+        uint16 _rarity,
+        uint16 _number
+    ) public view returns (uint16) {
+        uint16 amount = 100;
+        uint16 index = 0;
+        uint16 count = 0;
 
         for (
-            uint256 p = 0;
+            uint16 p = 0;
             p < GenPoolPercentage[_nftType][_rarity].length;
             p++
         ) {
             uint256 qtyItem = (amount *
                 GenPoolPercentage[_nftType][_rarity][p]) / 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 count++;
             }
         }
 
-        uint256 _modNumber = _number % count;
+        uint16 _modNumber = uint16(_number) % count;
 
         for (
-            uint256 p = 0;
+            uint16 p = 0;
             p < GenPoolPercentage[_nftType][_rarity].length;
             p++
         ) {
             uint256 qtyItem = (amount *
                 GenPoolPercentage[_nftType][_rarity][p]) / 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 if (_modNumber == index) {
                     return GenPoolResults[_nftType][_rarity][p];
                 }
@@ -908,27 +907,27 @@ contract RandomRate is Ownable {
         return 0;
     }
 
-    function getNFTPool(uint256 _nftType, uint256 _number)
+    function getNFTPool(uint16 _nftType, uint16 _number)
         public
         view
-        returns (uint256)
+        returns (uint16)
     {
-        uint256 amount = 1000;
-        uint256 count = 0;
-        uint256 index = 0;
+        uint16 amount = 100;
+        uint16 count = 0;
+        uint16 index = 0;
  
-        for (uint256 p = 0; p < percentage[_nftType].length; p++) {
+        for (uint16 p = 0; p < percentage[_nftType].length; p++) {
             uint256 qtyItem = (amount * percentage[_nftType][p]) / 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 count++;
             }
         }
 
-        uint256 _modNumber = _number % count;
+        uint16 _modNumber = uint16(_number) % count;
 
-        for (uint256 p = 0; p < percentage[_nftType].length; p++) {
+        for (uint16 p = 0; p < percentage[_nftType].length; p++) {
             uint256 qtyItem = (amount * percentage[_nftType][p]) / 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 if (_modNumber == index) {
                     return rateResults[_nftType][p];
                 }
@@ -940,41 +939,41 @@ contract RandomRate is Ownable {
         return 0;
     }
 
-    function getEquipmentPool(uint256 _number) public view returns (uint256) {
+    function getEquipmentPool(uint16 _number) public view returns (uint16) {
         return EPool[_number];
     }
 
     function getBlueprintPool(
-        uint256 _nftType,
-        uint256 _rarity,
-        uint256 eTypeId,
-        uint256 _number
-    ) public view returns (uint256) {
-        uint256 amount = 1000;
-        uint256 index = 0;
-        uint256 count = 0;
+        uint16 _nftType,
+        uint16 _rarity,
+        uint16 eTypeId,
+        uint16 _number
+    ) public view returns (uint16) {
+        uint16 amount = 100;
+        uint16 index = 0;
+        uint16 count = 0;
         for (
-            uint256 p = 0;
+            uint16 p = 0;
             p < BPPoolPercentage[_nftType][_rarity][eTypeId].length;
             p++
         ) {
             uint256 qtyItem = (amount *
                 BPPoolPercentage[_nftType][_rarity][eTypeId][p]) / 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 count++;
             }
         }
 
-        uint256 _modNumber = _number % count;
+        uint16 _modNumber = uint16(_number) % count;
 
         for (
-            uint256 p = 0;
+            uint16 p = 0;
             p < BPPoolPercentage[_nftType][_rarity][eTypeId].length;
             p++
         ) {
             uint256 qtyItem = (amount *
                 BPPoolPercentage[_nftType][_rarity][eTypeId][p]) / 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 if (_modNumber == index) {
                     return BPPoolResults[_nftType][_rarity][eTypeId][p];
                 }
@@ -987,28 +986,28 @@ contract RandomRate is Ownable {
     }
 
     function getSpaceWarriorPool(
-        uint256 _part,
-        uint256 _nftType,
-        uint256 _number
-    ) public view returns (uint256) {
-        uint256 amount = 1000;
-        uint256 count = 0;
-        uint256 index = 0;
+        uint16 _part,
+        uint16 _nftType,
+        uint16 _number
+    ) public view returns (uint16) {
+        uint16 amount = 100;
+        uint16 count = 0;
+        uint16 index = 0;
 
-        for (uint256 p = 0; p < SWPoolPercentage[_part][_nftType].length; p++) {
+        for (uint16 p = 0; p < SWPoolPercentage[_part][_nftType].length; p++) {
             uint256 qtyItem = (amount * SWPoolPercentage[_part][_nftType][p]) /
                 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 count++;
             }
         }
 
-        uint256 _modNumber = _number % count;
+        uint16 _modNumber = uint16(_number) % count;
 
-        for (uint256 p = 0; p < SWPoolPercentage[_part][_nftType].length; p++) {
+        for (uint16 p = 0; p < SWPoolPercentage[_part][_nftType].length; p++) {
             uint256 qtyItem = (amount * SWPoolPercentage[_part][_nftType][p]) /
                 10000;
-            for (uint256 i = 0; i < qtyItem; i++) {
+            for (uint16 i = 0; i < qtyItem; i++) {
                 if (_modNumber == index) {
                     return SWPoolResults[_part][_nftType][p];
                 }
