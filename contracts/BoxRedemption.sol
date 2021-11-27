@@ -82,12 +82,12 @@ contract BoxRedemption is Ownable {
 
     event OpenBox(address _by, uint256 _nftId, string partCode);
     event ChangeRandomRateContract(address _address);
-    event ChangeMystoryBoxContract(address _address);
+    event ChangeMysteryBoxContract(address _address);
     event ChangeNftCoreContract(address _address);
     event ChangeRandomWorkerContract(address _address);
 
     RANDOM_RATE randomRate;
-    address public mystoryBoxContract;
+    address public mysteryBoxContract;
     address public nftCoreContract;
     address public randomWorkerContract;
 
@@ -98,9 +98,9 @@ contract BoxRedemption is Ownable {
         emit ChangeRandomWorkerContract(_address);
     }
 
-    function changeMystoryBoxContract(address _address) public onlyOwner {
-        mystoryBoxContract = _address;
-        emit ChangeMystoryBoxContract(_address);
+    function changeMysteryBoxContract(address _address) public onlyOwner {
+        mysteryBoxContract = _address;
+        emit ChangeMysteryBoxContract(_address);
     }
 
     function changeNftCoreContract(address _address) public onlyOwner {
@@ -119,25 +119,24 @@ contract BoxRedemption is Ownable {
     ) internal {
         uint256 _randomNumber = RANDOM_CONTRACT(randomWorkerContract)
             .startRandom();
-        ranNumToSender[_randomNumber] = msg.sender;
-        requestToNFTId[_randomNumber] = _id;
+
         _token.burn(msg.sender, _id, 1);
 
         string memory _partCode = createNFTCode(_randomNumber, _id);
-        mintNFT(_randomNumber, _partCode);
+        mintNFT(msg.sender, _partCode);
         emit OpenBox(msg.sender, _id, _partCode);
     }
 
     function openBox(uint256 _id) public {
-        ERC1155_CONTRACT _token = ERC1155_CONTRACT(mystoryBoxContract);
+        ERC1155_CONTRACT _token = ERC1155_CONTRACT(mysteryBoxContract);
         uint256 _balance = _token.balanceOf(msg.sender, _id);
         require(_balance >= 1, "Your balance is insufficient.");
         burnAndMint(_token, _id);
     }
 
-    function mintNFT(uint256 randomNumber, string memory concatedCode) private {
+    function mintNFT(address to, string memory concatedCode) private {
         ERC721_CONTRACT _nftCore = ERC721_CONTRACT(nftCoreContract);
-        _nftCore.safeMint(ranNumToSender[randomNumber], concatedCode);
+        _nftCore.safeMint(to, concatedCode);
     }
 
     function createGenomic(

@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 import "hardhat/console.sol";
@@ -10,8 +9,13 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract ECIONFTCore is Initializable, ERC721Upgradeable, ERC721BurnableUpgradeable, ERC721URIStorageUpgradeable, AccessControlUpgradeable {
-    
+contract ECIONFTCore is
+    Initializable,
+    ERC721Upgradeable,
+    ERC721BurnableUpgradeable,
+    ERC721URIStorageUpgradeable,
+    AccessControlUpgradeable
+{
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -20,29 +24,54 @@ contract ECIONFTCore is Initializable, ERC721Upgradeable, ERC721BurnableUpgradea
 
     CountersUpgradeable.Counter private _tokenIdCounter;
     mapping(uint256 => uint256) private _createdAt;
-    mapping(uint256 => string)  private _partCodes;
+    mapping(uint256 => string) private _partCodes;
 
-    function initialize() initializer public {
+    function initialize() public initializer {
+
         __ERC721_init("ECIO NFT Core", "ECIO");
         __ERC721Burnable_init();
         __AccessControl_init();
         __ERC721URIStorage_init();
+        
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
         _setupRole(ADMIN_A_ROLE, msg.sender);
         _setupRole(ADMIN_B_ROLE, msg.sender);
+
+        //start tokenId at 3000
+        for (uint256 i = 0; i < 3000; i++) {
+            _tokenIdCounter.increment();
+        }
     }
 
     function _baseURI() internal pure override returns (string memory) {
         return "https://metadata.ecio.space/items/";
     }
 
-    function tokenInfo(uint256 tokenId) public view virtual returns (string memory, uint256) {
+    function tokenInfo(uint256 tokenId)
+        public
+        view
+        virtual
+        returns (string memory, uint256)
+    {
         return (_partCodes[tokenId], _createdAt[tokenId]);
     }
 
+    function migrateNFTV1(
+        address to,
+        string memory partCode,
+        uint256 tokenId,
+        uint256 createdAt
+    ) public onlyRole(MINTER_ROLE) {
+        _safeMint(to, tokenId);
+        _partCodes[tokenId] = partCode;
+        _createdAt[tokenId] = createdAt;
+    }
 
-    function safeMint(address to, string memory partCode) public onlyRole (MINTER_ROLE) {
+    function safeMint(address to, string memory partCode)
+        public
+        onlyRole(MINTER_ROLE)
+    {
         _safeMint(to, _tokenIdCounter.current());
         _partCodes[_tokenIdCounter.current()] = partCode;
         _createdAt[_tokenIdCounter.current()] = block.timestamp;
@@ -78,7 +107,7 @@ contract ECIONFTCore is Initializable, ERC721Upgradeable, ERC721BurnableUpgradea
         address _contractAddress,
         address _to,
         uint256 _amount
-    ) public onlyRole (DEFAULT_ADMIN_ROLE) {
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         IERC20 _token = IERC20(_contractAddress);
         _token.transfer(_to, _amount);
     }
