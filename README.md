@@ -21,4 +21,4 @@ npx hardhat compile
 npx hardhat run scripts/sample-script.js --network testnet
 npx hardhat  verify --network testnet {CONTRACT_ADDRESS} --contract contracts/Market.sol:Market
 ```
-npx hardhat  verify --network testnet 0x5bAa6FaF5BeB33D154598560f04196074954bD5C --contract contracts/Market.sol:Market
+npx hardhat  verify --network testnet 0x5bAa6FaF5BeB33D154598560f04196074954bD5C --contract contracts/ECIONFTCore.sol:ECIONFTCore
