@@ -180,180 +180,127 @@ contract BoxRedemption is Ownable {
             );
     }
 
-    function createNFTCode(uint256 _ranNum, uint256 _nftType)
+    function createNFTCode(uint256 _randomNumber, uint256 _nftType)
         internal
         view
         returns (string memory)
     {
-        uint256 randomNFTType = ranNumWithMod(_ranNum, 1, 20);
-        // uint256 nftTypeCode = NFTPool[_id][randomNFTType];
-        uint256 nftTypeCode = randomRate.getNFTPool(_nftType, randomNFTType);
-
         string memory partCode;
-        uint256 eRandom = ranNumWithMod(_ranNum, 2, 5);
-        // uint256 eTypeId = EPool[eRandom];
-        uint256 eTypeId = randomRate.getEquipmentPool(eRandom);
+        uint256 randomNumberForNFTType = getNumberAndMod(_randomNumber, 1, 1000);
+        uint256 nftTypeCode = randomRate.getNFTPool(_nftType, randomNumberForNFTType);
 
-        if (nftTypeCode == GENOMIC_COMMON) {
-            uint256 number = ranNumWithMod(_ranNum, 2, 7);
-            partCode = createGenomic(_nftType, nftTypeCode, number, COMMON);
-        } else if (nftTypeCode == GENOMIC_RARE) {
-            uint256 number = ranNumWithMod(_ranNum, 2, 6);
-            partCode = createGenomic(_nftType, nftTypeCode, number, RARE);
-        } else if (nftTypeCode == GENOMIC_EPIC) {
-            uint256 number = ranNumWithMod(_ranNum, 2, 4);
-            partCode = createGenomic(_nftType, nftTypeCode, number, EPIC);
-        } else if (nftTypeCode == BLUEPRINT_COMM) {
-            uint256 maxRan = maxRanForBluePrintCommon(_nftType, eTypeId);
-            eRandom = ranNumWithMod(_ranNum, 2, maxRan);
-            // uint256 ePartId = BPPool[_id][COMMON][eTypeId][eRandom];
+        uint256 equipmentRandom = getNumberAndMod(_randomNumber, 2, 5);
+        uint256 index = getNumberAndMod(_randomNumber, 3, 1000);
+        uint256 eTypeId = randomRate.getEquipmentPool(equipmentRandom);
+        
+        if (nftTypeCode == GENOMIC_COMMON) { //GENOMIC_COMMON
+            partCode = createGenomic(_nftType, nftTypeCode, index, COMMON);
+
+        } else if (nftTypeCode == GENOMIC_RARE) { //GENOMIC_RARE
+            partCode = createGenomic(_nftType, nftTypeCode, index, RARE);
+
+        } else if (nftTypeCode == GENOMIC_EPIC) { //GENOMIC_EPIC
+            partCode = createGenomic(_nftType, nftTypeCode, index, EPIC);
+
+        } else if (nftTypeCode == BLUEPRINT_COMM) { //BLUEPRINT_COMM
             uint256 ePartId = randomRate.getBlueprintPool(
                 _nftType,
                 COMMON,
                 eTypeId,
-                eRandom
+                index
             );
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
-        } else if (nftTypeCode == BLUEPRINT_RARE) {
-            uint256 maxRan = maxRanForBluePrintRare(_nftType, eTypeId);
-            eRandom = ranNumWithMod(_ranNum, 2, maxRan);
-            // uint256 ePartId = BPPool[_id][RARE][eTypeId][eRandom];
+            
+        } else if (nftTypeCode == BLUEPRINT_RARE) { //BLUEPRINT_RARE
             uint256 ePartId = randomRate.getBlueprintPool(
                 _nftType,
                 RARE,
                 eTypeId,
-                eRandom
+                index
             );
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
-        } else if (nftTypeCode == BLUEPRINT_EPIC) {
-            uint256 maxRan = maxRanForBluePrintEpic(_nftType, eTypeId);
-            eRandom = ranNumWithMod(_ranNum, 2, maxRan);
-            // uint256 ePartId = BPPool[_id][EPIC][eTypeId][eRandom];
+
+        } else if (nftTypeCode == BLUEPRINT_EPIC) { //BLUEPRINT_EPIC
             uint256 ePartId = randomRate.getBlueprintPool(
                 _nftType,
                 EPIC,
                 eTypeId,
-                eRandom
+                index
             );
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
-        } else if (nftTypeCode == SPACE_WARRIOR) {
-            partCode = createSW(_ranNum, _nftType);
+
+        } else if (nftTypeCode == SPACE_WARRIOR) { //SPACE_WARRIOR
+            partCode = createSW(_randomNumber, _nftType);
         }
 
         return partCode;
     }
 
-    function ranNumWithMod(
+    function getNumberAndMod(
         uint256 _ranNum,
         uint256 digit,
         uint256 mod
     ) public view virtual returns (uint256) {
         if (digit == 1) {
-            return (_ranNum % 100) % mod;
+            return (_ranNum % 10000) % mod;
         } else if (digit == 2) {
-            return ((_ranNum % 10000) / 100) % mod;
+            return ((_ranNum % 100000000) / 10000) % mod;
         } else if (digit == 3) {
-            return ((_ranNum % 1000000) / 10000) % mod;
+            return ((_ranNum % 1000000000000) / 100000000) % mod;
         } else if (digit == 4) {
-            return ((_ranNum % 100000000) / 1000000) % mod;
+            return ((_ranNum % 10000000000000000) / 1000000000000) % mod;
         } else if (digit == 5) {
-            return ((_ranNum % 10000000000) / 100000000) % mod;
+            return ((_ranNum % 100000000000000000000) / 10000000000000000) % mod;
         } else if (digit == 6) {
-            return ((_ranNum % 1000000000000) / 10000000000) % mod;
+            return ((_ranNum % 1000000000000000000000000) / 100000000000000000000) % mod;
         } else if (digit == 7) {
-            return ((_ranNum % 100000000000000) / 1000000000000) % mod;
+            return ((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000) % mod;
         } else if (digit == 8) {
-            return ((_ranNum % 10000000000000000) / 100000000000000) % mod;
+            return ((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000) % mod;
         }
 
         return 0;
     }
 
+    function getNumberAndMod2(
+        uint256 _ranNum,
+        uint256 digit 
+    ) public view virtual returns (uint256) {
+        if (digit == 1) {
+            return (_ranNum %  10000) ;
+        } else if (digit == 2) {
+            return ((_ranNum % 100000000) / 10000);
+        } else if (digit == 3) {
+            return ((_ranNum % 1000000000000) / 100000000);
+        } else if (digit == 4) {
+            return ((_ranNum % 10000000000000000) / 1000000000000) ;
+        } else if (digit == 5) {
+            return ((_ranNum % 100000000000000000000) / 10000000000000000);
+        } else if (digit == 6) {
+            return ((_ranNum % 1000000000000000000000000) / 100000000000000000000) ;
+        } else if (digit == 7) {
+            return ((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000) ;
+        } else if (digit == 8) {
+            return ((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000) ;
+        }
+
+        return 0;
+    }
+    
+
     function extactDigit(uint256 _ranNum) internal pure returns (Digit memory) {
         Digit memory digit;
-        digit.digit1 = (_ranNum % 100);
-        digit.digit2 = ((_ranNum % 10000) / 100);
-        digit.digit3 = ((_ranNum % 1000000) / 10000);
-        digit.digit4 = ((_ranNum % 100000000) / 1000000);
-        digit.digit5 = ((_ranNum % 10000000000) / 100000000);
-        digit.digit6 = ((_ranNum % 1000000000000) / 10000000000);
-        digit.digit7 = ((_ranNum % 100000000000000) / 1000000000000);
-        digit.digit8 = ((_ranNum % 10000000000000000) / 100000000000000);
+        digit.digit1 = (_ranNum %  10000);
+        digit.digit2 = ((_ranNum % 100000000) / 10000);
+        digit.digit3 = ((_ranNum % 1000000000000) / 100000000);
+        digit.digit4 = ((_ranNum % 10000000000000000) / 1000000000000);
+        digit.digit5 = ((_ranNum % 100000000000000000000) / 10000000000000000);
+        digit.digit6 = ((_ranNum % 1000000000000000000000000) / 100000000000000000000);
+        digit.digit7 = ((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000);
+        digit.digit8 = ((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000);
         return digit;
     }
-
-    function maxRanForBluePrintCommon(uint256 _id, uint256 eTypeId)
-        private
-        pure
-        returns (uint256)
-    {
-        uint256 maxRan;
-        if (_id == COMMON || _id == RARE) {
-            if (eTypeId == SUITE) {
-                maxRan = 3;
-            } else {
-                maxRan = 4;
-            }
-        } else if (_id == EPIC) {
-            if (eTypeId == GEAR || eTypeId == DRO || eTypeId == BOT) {
-                maxRan = 3;
-            } else if (eTypeId == SUITE) {
-                maxRan = 4;
-            } else if (eTypeId == WEAP) {
-                maxRan = 6;
-            }
-        }
-
-        return maxRan;
-    }
-
-    function maxRanForBluePrintRare(uint256 _id, uint256 eTypeId)
-        private
-        pure
-        returns (uint256)
-    {
-        uint256 maxRan;
-        if (_id == COMMON) {
-            if (eTypeId == WEAP) {
-                maxRan = 4;
-            } else {
-                maxRan = 3;
-            }
-        } else if (_id == RARE) {
-            if (eTypeId == WEAP) {
-                maxRan = 5;
-            } else {
-                maxRan = 3;
-            }
-        } else if (_id == EPIC) {
-            if (eTypeId == GEAR || eTypeId == DRO || eTypeId == BOT) {
-                maxRan = 3;
-            } else if (eTypeId == SUITE) {
-                maxRan = 4;
-            } else if (eTypeId == WEAP) {
-                maxRan = 6;
-            }
-        }
-        return maxRan;
-    }
-
-    function maxRanForBluePrintEpic(uint256 _id, uint256 eTypeId)
-        private
-        pure
-        returns (uint256)
-    {
-        uint256 maxRan;
-        if (_id == RARE || _id == EPIC) {
-            if (eTypeId == GEAR || eTypeId == DRO || eTypeId == BOT) {
-                maxRan = 3;
-            } else if (eTypeId == SUITE) {
-                maxRan = 4;
-            } else if (eTypeId == WEAP) {
-                maxRan = 6;
-            }
-        }
-        return maxRan;
-    }
+  
 
     struct Digit {
         uint256 digit1;
@@ -366,13 +313,12 @@ contract BoxRedemption is Ownable {
         uint256 digit8;
     }
 
-    function createSW(uint256 _random, uint256 _nftType)
+    function createSW(uint256 _randomNumber, uint256 _nftType)
         private
         view
         returns (string memory)
     {
-        Digit memory d = extactDigit(_random);
-
+      
         uint256 trainingId;
         uint256 battleGearId;
         uint256 battleDroneId;
@@ -381,23 +327,14 @@ contract BoxRedemption is Ownable {
         uint256 humanGenomeId;
         uint256 weaponId;
 
-        trainingId = d.digit2 % 5;
-        battleGearId = d.digit3 % 30;
-        battleDroneId = d.digit4 % 30;
-        battleBotId = d.digit6 % 30;
-        if (_nftType == COMMON) {
-            battleSuiteId = d.digit5 % 18;
-            humanGenomeId = d.digit7 % 28;
-            weaponId = d.digit8 % 29;
-        } else if (_nftType == RARE) {
-            battleSuiteId = d.digit5 % 17;
-            humanGenomeId = d.digit7 % 25;
-            weaponId = d.digit8 % 34;
-        } else if (_nftType == EPIC) {
-            battleSuiteId = d.digit5 % 19;
-            humanGenomeId = d.digit7 % 29;
-            weaponId = d.digit8 % 32;
-        }
+        trainingId = getNumberAndMod(_randomNumber, 2, 1000);
+        battleGearId = getNumberAndMod(_randomNumber, 3, 1000);
+        battleDroneId = getNumberAndMod(_randomNumber, 4, 1000);
+        battleSuiteId = getNumberAndMod(_randomNumber, 5, 1000);
+        battleBotId = getNumberAndMod(_randomNumber, 6, 1000);
+        humanGenomeId = getNumberAndMod(_randomNumber, 7, 1000);
+        weaponId = getNumberAndMod(_randomNumber, 8, 1000);
+       
 
         string memory concatedCode = convertCodeToStr(6);
         concatedCode = concateCode(concatedCode, 0); //kingdomCode
