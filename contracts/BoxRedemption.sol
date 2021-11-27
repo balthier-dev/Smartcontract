@@ -77,22 +77,6 @@ contract BoxRedemption is Ownable {
     uint8 private constant RARE = 1;
     uint8 private constant EPIC = 2;
 
-    // //Testnet
-    // address public constant MISTORY_BOX_CONTRACT =
-    //     0xfB684dC65DE6C27c63fa7a00B9b9fB70d2125Ea1;
-    // address public constant ECIO_NFT_CORE_CONTRACT =
-    //     0x7E8eEe5be55A589d5571Be7176172f4DEE7f47aF;
-    // address public constant RANDOM_WORKER_CONTRACT =
-    //     0x5ABF279B87F84C916d0f34c2dafc949f86ffb887;
-
-    //Main
-    // address public MystoryBoxContract =
-    //     0x1ddCD5B73afb734b4AE6B1C139858F36311Ed4d3;
-    // address public constant ECIO_NFT_CORE_CONTRACT =
-    //     0x328Bac8C81A947094f34651e6B0e548EBe35796B;
-    // address public constant RANDOM_WORKER_CONTRACT =
-    //     0xa17Dc043C68B7714B6D0847ab45F1cE73fc05Bca;
-
     mapping(uint256 => address) ranNumToSender;
     mapping(uint256 => uint256) requestToNFTId;
 
@@ -131,24 +115,24 @@ contract BoxRedemption is Ownable {
 
     function burnAndMint(
         ERC1155_CONTRACT _token,
-        uint256 _nftType,
         uint256 _id
     ) internal {
-        uint256 randomNumber = RANDOM_CONTRACT(randomWorkerContract)
+        uint256 _randomNumber = RANDOM_CONTRACT(randomWorkerContract)
             .startRandom();
-        ranNumToSender[randomNumber] = msg.sender;
-        requestToNFTId[randomNumber] = _nftType;
+        ranNumToSender[_randomNumber] = msg.sender;
+        requestToNFTId[_randomNumber] = _id;
         _token.burn(msg.sender, _id, 1);
-        string memory partCode = createNFTCode(randomNumber, _nftType);
-        mintNFT(randomNumber, partCode);
-        emit OpenBox(msg.sender, _nftType, partCode);
+
+        string memory _partCode = createNFTCode(_randomNumber, _id);
+        mintNFT(_randomNumber, _partCode);
+        emit OpenBox(msg.sender, _id, _partCode);
     }
 
     function openBox(uint256 _id) public {
         ERC1155_CONTRACT _token = ERC1155_CONTRACT(mystoryBoxContract);
         uint256 _balance = _token.balanceOf(msg.sender, _id);
         require(_balance >= 1, "Your balance is insufficient.");
-        burnAndMint(_token, _id, _id);
+        burnAndMint(_token, _id);
     }
 
     function mintNFT(uint256 randomNumber, string memory concatedCode) private {
@@ -261,116 +245,49 @@ contract BoxRedemption is Ownable {
 
         return 0;
     }
-
-    function getNumberAndMod2(
-        uint256 _ranNum,
-        uint256 digit 
-    ) public view virtual returns (uint256) {
-        if (digit == 1) {
-            return (_ranNum %  10000) ;
-        } else if (digit == 2) {
-            return ((_ranNum % 100000000) / 10000);
-        } else if (digit == 3) {
-            return ((_ranNum % 1000000000000) / 100000000);
-        } else if (digit == 4) {
-            return ((_ranNum % 10000000000000000) / 1000000000000) ;
-        } else if (digit == 5) {
-            return ((_ranNum % 100000000000000000000) / 10000000000000000);
-        } else if (digit == 6) {
-            return ((_ranNum % 1000000000000000000000000) / 100000000000000000000) ;
-        } else if (digit == 7) {
-            return ((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000) ;
-        } else if (digit == 8) {
-            return ((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000) ;
-        }
-
-        return 0;
-    }
     
-
-    function extactDigit(uint256 _ranNum) internal pure returns (Digit memory) {
-        Digit memory digit;
-        digit.digit1 = (_ranNum %  10000);
-        digit.digit2 = ((_ranNum % 100000000) / 10000);
-        digit.digit3 = ((_ranNum % 1000000000000) / 100000000);
-        digit.digit4 = ((_ranNum % 10000000000000000) / 1000000000000);
-        digit.digit5 = ((_ranNum % 100000000000000000000) / 10000000000000000);
-        digit.digit6 = ((_ranNum % 1000000000000000000000000) / 100000000000000000000);
-        digit.digit7 = ((_ranNum % 10000000000000000000000000000) / 1000000000000000000000000);
-        digit.digit8 = ((_ranNum % 100000000000000000000000000000000) / 10000000000000000000000000000);
-        return digit;
-    }
-  
-
-    struct Digit {
-        uint256 digit1;
-        uint256 digit2;
-        uint256 digit3;
-        uint256 digit4;
-        uint256 digit5;
-        uint256 digit6;
-        uint256 digit7;
-        uint256 digit8;
-    }
-
     function createSW(uint256 _randomNumber, uint256 _nftType)
         private
         view
         returns (string memory)
     {
       
-        uint256 trainingId;
-        uint256 battleGearId;
-        uint256 battleDroneId;
-        uint256 battleSuiteId;
-        uint256 battleBotId;
-        uint256 humanGenomeId;
-        uint256 weaponId;
-
-        trainingId = getNumberAndMod(_randomNumber, 2, 1000);
-        battleGearId = getNumberAndMod(_randomNumber, 3, 1000);
-        battleDroneId = getNumberAndMod(_randomNumber, 4, 1000);
-        battleSuiteId = getNumberAndMod(_randomNumber, 5, 1000);
-        battleBotId = getNumberAndMod(_randomNumber, 6, 1000);
-        humanGenomeId = getNumberAndMod(_randomNumber, 7, 1000);
-        weaponId = getNumberAndMod(_randomNumber, 8, 1000);
+        uint256 trainingId = getNumberAndMod(_randomNumber, 2, 1000);
+        uint256 battleGearId = getNumberAndMod(_randomNumber, 3, 1000);
+        uint256 battleDroneId  = getNumberAndMod(_randomNumber, 4, 1000);
+        uint256 battleSuiteId = getNumberAndMod(_randomNumber, 5, 1000);
+        uint256 battleBotId = getNumberAndMod(_randomNumber, 6, 1000);
+        uint256 humanGenomeId = getNumberAndMod(_randomNumber, 7, 1000);
+        uint256 weaponId = getNumberAndMod(_randomNumber, 8, 1000);
        
-
         string memory concatedCode = convertCodeToStr(6);
         concatedCode = concateCode(concatedCode, 0); //kingdomCode
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[TRANING_CAMP][_nftType][trainingId]
             randomRate.getSpaceWarriorPool(TRANING_CAMP, _nftType, trainingId)
         );
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[GEAR][_nftType][battleGearId]
             randomRate.getSpaceWarriorPool(GEAR, _nftType, battleGearId)
         );
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[DRO][_nftType][battleDroneId]
             randomRate.getSpaceWarriorPool(DRO, _nftType, battleDroneId)
         );
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[SUITE][_nftType][battleSuiteId]
             randomRate.getSpaceWarriorPool(SUITE, _nftType, battleSuiteId)
         );
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[BOT][_nftType][battleBotId]
             randomRate.getSpaceWarriorPool(BOT, _nftType, battleBotId)
         );
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[GEN][_nftType][humanGenomeId]
             randomRate.getSpaceWarriorPool(GEN, _nftType, humanGenomeId)
         );
         concatedCode = concateCode(
             concatedCode,
-            // SWPool[WEAP][_nftType][weaponId]
             randomRate.getSpaceWarriorPool(WEAP, _nftType, weaponId)
         );
         concatedCode = concateCode(concatedCode, 0); //Star
