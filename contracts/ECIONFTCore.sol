@@ -22,17 +22,17 @@ contract ECIONFTCore is
     bytes32 public constant ADMIN_A_ROLE = keccak256("ADMIN_A");
     bytes32 public constant ADMIN_B_ROLE = keccak256("ADMIN_B");
 
-    CountersUpgradeable.Counter private _tokenIdCounter;
-    mapping(uint256 => uint256) private _createdAt;
-    mapping(uint256 => string) private _partCodes;
+    CountersUpgradeable.Counter private tokenIdCounter;
+    mapping(uint256 => uint256) private createdAt;
+    mapping(uint256 => string) private partCodes;
+    mapping(address => bool) public operators;
 
     function initialize() public initializer {
-
         __ERC721_init("ECIO NFT Core", "ECIO");
         __ERC721Burnable_init();
         __AccessControl_init();
         __ERC721URIStorage_init();
-        
+
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
         _setupRole(ADMIN_A_ROLE, msg.sender);
@@ -40,58 +40,77 @@ contract ECIONFTCore is
 
         //start tokenId at 3000
         for (uint256 i = 0; i < 3000; i++) {
-            _tokenIdCounter.increment();
+             tokenIdCounter.increment();
         }
+    }
+
+    modifier onlyOperatorAddress() {
+        require(operators[msg.sender] == true);
+        _;
+    }
+
+    function addOperatorAddress(address _address)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        operators[_address] = true;
+    }
+
+    function removeOperatorAddress(address _address)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        operators[_address] = false;
     }
 
     function _baseURI() internal pure override returns (string memory) {
         return "https://metadata.ecio.space/items/";
     }
 
-    function tokenInfo(uint256 tokenId)
+    function tokenInfo(uint256 _tokenId)
         public
         view
         virtual
         returns (string memory, uint256)
     {
-        return (_partCodes[tokenId], _createdAt[tokenId]);
+        return (partCodes[_tokenId], createdAt[_tokenId]);
     }
 
     function migrateNFTV1(
-        address to,
-        string memory partCode,
-        uint256 tokenId,
-        uint256 createdAt
+        address _to,
+        string memory _partCode,
+        uint256 _tokenId,
+        uint256 _createdAt
     ) public onlyRole(MINTER_ROLE) {
-        _safeMint(to, tokenId);
-        _partCodes[tokenId] = partCode;
-        _createdAt[tokenId] = createdAt;
+        _safeMint(_to, _tokenId);
+        partCodes[_tokenId] = _partCode;
+        createdAt[_tokenId] = _createdAt;
     }
 
-    function safeMint(address to, string memory partCode)
+    function safeMint(address _to, string memory _partCode)
         public
         onlyRole(MINTER_ROLE)
     {
-        _safeMint(to, _tokenIdCounter.current());
-        _partCodes[_tokenIdCounter.current()] = partCode;
-        _createdAt[_tokenIdCounter.current()] = block.timestamp;
-        _tokenIdCounter.increment();
+        _safeMint(_to, tokenIdCounter.current());
+        partCodes[tokenIdCounter.current()] = _partCode;
+        createdAt[tokenIdCounter.current()] = block.timestamp;
+        tokenIdCounter.increment();
     }
 
-    function _burn(uint256 tokenId)
+    function _burn(uint256 _tokenId)
         internal
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
     {
-        super._burn(tokenId);
+        super._burn(_tokenId);
     }
 
-    function tokenURI(uint256 tokenId)
+    function tokenURI(uint256 _tokenId)
         public
         view
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
         returns (string memory)
     {
-        return super.tokenURI(tokenId);
+        return super.tokenURI(_tokenId);
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -101,6 +120,20 @@ contract ECIONFTCore is
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function setApprovalForAll(
+        address _operator,
+        bool _approved
+    ) public override(ERC721Upgradeable) {
+        require(operators[_operator] == true);
+        super.setApprovalForAll(_operator, _approved);
+        
+    }
+
+    function approve(address _to, uint256 _tokenId) public virtual override(ERC721Upgradeable) {
+        require(operators[_to] == true);
+        super.approve(_to, _tokenId);
     }
 
     function transfer(
