@@ -39,10 +39,10 @@ describe("ECIO-NFT-Ecosystem", function () {
     await randomRate.deployed();
 
     await randomRate.initial();
-    await randomRate.initialRandomData();
-    await randomRate.initialSpaceData1();
-    await randomRate.initialSpaceData2();
-    await randomRate.initialSpaceData3();
+    // await randomRate.initialRandomData();
+    // await randomRate.initialSpaceData1();
+    // await randomRate.initialSpaceData2();
+    // await randomRate.initialSpaceData3();
 
     //Deploy RandomWorker Contract  
     const RandomWorker = await ethers.getContractFactory("RandomWorker");
@@ -66,8 +66,13 @@ describe("ECIO-NFT-Ecosystem", function () {
   });
 
   it("RandomRate Setup Testing", async function () {
-    const resutl = await randomRate.getBlueprintPool(COMMON_BOX, 0, 3, 3)
-    expect(resutl).to.equal(4);
+    //NFTPool
+    expect(0).to.equal(await randomRate.getNFTPool(0, 299));
+    expect(1).to.equal(await randomRate.getNFTPool(0, 300));
+    expect(1).to.equal(await randomRate.getNFTPool(0, 499));
+    expect(3).to.equal(await randomRate.getNFTPool(0, 500));
+    expect(3).to.equal(await randomRate.getNFTPool(0, 899));
+    expect(6).to.equal(await randomRate.getNFTPool(0, 900));
   });
 
   it("boxRedemption Setup Testing", async function () {
@@ -98,7 +103,7 @@ describe("ECIO-NFT-Ecosystem", function () {
     expect(await mysteryBoxContract.balanceOf(owner.address, COMMON_BOX)).to.equal(9);
     expect(await nftCoreContract.balanceOf(owner.address)).to.equal(1);
 
-    console.log(await nftCoreContract.tokenInfo(0))
+    // console.log(await nftCoreContract.tokenInfo(0))
 
   });
 });
