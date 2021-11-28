@@ -34,16 +34,20 @@ contract RandomRate is Ownable {
     //EPool
     mapping(uint16 => uint16) public EPool;
 
-    mapping(uint16 => uint16[]) rateResults;
-    mapping(uint16 => uint256[]) percentage;
+    mapping(uint16 => uint16[]) NFTPoolResults;
+    mapping(uint16 => uint16[]) NFTPoolValues;
+    mapping(uint16 => uint256[]) NFTPoolPercentage;
 
     mapping(uint16 => mapping(uint16 => uint256[])) GenPoolPercentage;
     mapping(uint16 => mapping(uint16 => uint16[])) GenPoolResults;
+    mapping(uint16 => mapping(uint16 => uint16[])) GenPoolValues;
 
-    mapping(uint16 => mapping(uint16 => mapping(uint16 => uint256[]))) BPPoolPercentage;
+    mapping(uint16 => mapping(uint16 => mapping(uint16 => uint256[]))) BPPoolPercent;
     mapping(uint16 => mapping(uint16 => mapping(uint16 => uint16[]))) BPPoolResults;
+    mapping(uint16 => mapping(uint16 => mapping(uint16 => uint16[]))) BPPoolValues;
 
     mapping(uint16 => mapping(uint16 => uint16[])) SWPoolResults;
+    mapping(uint16 => mapping(uint16 => uint16[])) SWPoolValues;
     mapping(uint16 => mapping(uint16 => uint256[])) SWPoolPercentage;
 
     function initial() public onlyOwner {
@@ -54,18 +58,26 @@ contract RandomRate is Ownable {
         EPool[4] = WEAP; //WEAP
 
         //-----------------START COMMON BOX RATE --------------------------------
-        rateResults[COMMON_BOX] = [
+        NFTPoolResults[COMMON_BOX] = [
             BLUEPRINT_COMM,
             BLUEPRINT_RARE,
             GENOMIC_COMMON,
             SPACE_WARRIOR
         ];
-        percentage[COMMON_BOX] = [
+        NFTPoolPercentage[COMMON_BOX] = [
             uint256(3000),
             uint256(2000),
             uint256(4000),
             uint256(1000)
         ];
+
+        //Assign mapping
+        for (uint16 p = 0; p < NFTPoolPercentage[COMMON_BOX].length; p++) {
+            uint256 qtyItem = (1000 * NFTPoolPercentage[COMMON_BOX][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                NFTPoolValues[COMMON_BOX].push(NFTPoolResults[COMMON_BOX][p]);
+            }
+        }
 
         GenPoolPercentage[COMMON_BOX][COMMON] = [0, 1, 2, 3, 4, 5, 6];
         GenPoolPercentage[COMMON_BOX][COMMON] = [
@@ -79,7 +91,7 @@ contract RandomRate is Ownable {
         ];
 
         //COMMON
-        BPPoolPercentage[COMMON_BOX][COMMON][GEAR] = [
+        BPPoolPercent[COMMON_BOX][COMMON][GEAR] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
@@ -87,22 +99,66 @@ contract RandomRate is Ownable {
         ];
         BPPoolResults[COMMON_BOX][COMMON][GEAR] = [1, 2, 3, 4];
 
-        BPPoolPercentage[COMMON_BOX][COMMON][DRO] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][COMMON][GEAR].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][COMMON][GEAR][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][COMMON][GEAR].push(
+                    BPPoolResults[COMMON_BOX][COMMON][GEAR][p]
+                );
+            }
+        }
+        //------------
+        BPPoolPercent[COMMON_BOX][COMMON][DRO] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[COMMON_BOX][COMMON][DRO] = [1, 2, 3, 4];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][COMMON][DRO].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][COMMON][DRO][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][COMMON][DRO].push(
+                    BPPoolResults[COMMON_BOX][COMMON][DRO][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[COMMON_BOX][COMMON][SUITE] = [
+        //---------
+
+        BPPoolPercent[COMMON_BOX][COMMON][SUITE] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[COMMON_BOX][COMMON][SUITE] = [0, 1, 2];
 
-        BPPoolPercentage[COMMON_BOX][COMMON][BOT] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][COMMON][SUITE].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][COMMON][SUITE][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][COMMON][SUITE].push(
+                    BPPoolResults[COMMON_BOX][COMMON][SUITE][p]
+                );
+            }
+        }
+
+        //-----
+        BPPoolPercent[COMMON_BOX][COMMON][BOT] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
@@ -110,44 +166,123 @@ contract RandomRate is Ownable {
         ];
         BPPoolResults[COMMON_BOX][COMMON][BOT] = [1, 2, 3, 4];
 
-        BPPoolPercentage[COMMON_BOX][COMMON][WEAP] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][COMMON][BOT].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][COMMON][BOT][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][COMMON][BOT].push(
+                    BPPoolResults[COMMON_BOX][COMMON][BOT][p]
+                );
+            }
+        }
+        //-------
+        BPPoolPercent[COMMON_BOX][COMMON][WEAP] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[COMMON_BOX][COMMON][WEAP] = [0, 1, 2, 3];
-
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][COMMON][WEAP].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][COMMON][WEAP][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][COMMON][WEAP].push(
+                    BPPoolResults[COMMON_BOX][COMMON][WEAP][p]
+                );
+            }
+        }
+        //-------
         //RARE
-        BPPoolPercentage[COMMON_BOX][RARE][GEAR] = [
+        BPPoolPercent[COMMON_BOX][RARE][GEAR] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[COMMON_BOX][RARE][GEAR] = [5, 6, 7];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][RARE][GEAR].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][RARE][GEAR][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][RARE][GEAR].push(
+                    BPPoolResults[COMMON_BOX][RARE][GEAR][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[COMMON_BOX][RARE][DRO] = [
+        BPPoolPercent[COMMON_BOX][RARE][DRO] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[COMMON_BOX][RARE][DRO] = [5, 6, 7];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][RARE][DRO].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[COMMON_BOX][RARE][DRO][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][RARE][DRO].push(
+                    BPPoolResults[COMMON_BOX][RARE][DRO][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[COMMON_BOX][RARE][SUITE] = [
+        BPPoolPercent[COMMON_BOX][RARE][SUITE] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[COMMON_BOX][RARE][SUITE] = [3, 4, 5];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][RARE][SUITE].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][RARE][SUITE][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][RARE][SUITE].push(
+                    BPPoolResults[COMMON_BOX][RARE][SUITE][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[COMMON_BOX][RARE][BOT] = [
+        BPPoolPercent[COMMON_BOX][RARE][BOT] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[COMMON_BOX][RARE][BOT] = [5, 6, 7];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][RARE][BOT].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[COMMON_BOX][RARE][BOT][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][RARE][BOT].push(
+                    BPPoolResults[COMMON_BOX][RARE][BOT][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[COMMON_BOX][RARE][WEAP] = [
+        BPPoolPercent[COMMON_BOX][RARE][WEAP] = [
             uint256(2000),
             uint256(2000),
             uint256(2000),
@@ -155,6 +290,19 @@ contract RandomRate is Ownable {
             uint256(2000)
         ];
         BPPoolResults[COMMON_BOX][RARE][WEAP] = [4, 5, 6, 7, 8];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[COMMON_BOX][RARE][WEAP].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[COMMON_BOX][RARE][WEAP][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[COMMON_BOX][RARE][WEAP].push(
+                    BPPoolResults[COMMON_BOX][RARE][WEAP][p]
+                );
+            }
+        }
 
         //SW
         SWPoolResults[TRANING_CAMP][COMMON_BOX] = [0, 1, 2, 3, 4];
@@ -239,7 +387,7 @@ contract RandomRate is Ownable {
         //-----------------END COMMON BOX RATE --------------------------------
 
         //-----------------START RARE BOX RATE --------------------------------
-        rateResults[RARE_BOX] = [
+        NFTPoolResults[RARE_BOX] = [
             BLUEPRINT_COMM,
             BLUEPRINT_RARE,
             BLUEPRINT_EPIC,
@@ -247,7 +395,7 @@ contract RandomRate is Ownable {
             GENOMIC_RARE,
             SPACE_WARRIOR
         ];
-        percentage[RARE_BOX] = [
+        NFTPoolPercentage[RARE_BOX] = [
             uint256(1000),
             uint256(1000),
             uint256(500),
@@ -255,6 +403,14 @@ contract RandomRate is Ownable {
             uint256(3000),
             uint256(2500)
         ];
+
+        //Assign mapping
+        for (uint16 p = 0; p < NFTPoolPercentage[RARE_BOX].length; p++) {
+            uint256 qtyItem = (1000 * NFTPoolPercentage[RARE_BOX][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                NFTPoolValues[RARE_BOX].push(NFTPoolResults[RARE_BOX][p]);
+            }
+        }
 
         GenPoolPercentage[RARE_BOX][COMMON] = [0, 1, 2, 3, 4, 5, 6];
         GenPoolPercentage[RARE_BOX][COMMON] = [
@@ -278,75 +434,187 @@ contract RandomRate is Ownable {
         ];
 
         //COMMON
-        BPPoolPercentage[RARE_BOX][COMMON][GEAR] = [
+        BPPoolPercent[RARE_BOX][COMMON][GEAR] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[RARE_BOX][COMMON][GEAR] = [1, 2, 3, 4];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][COMMON][GEAR].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[RARE_BOX][COMMON][GEAR][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][COMMON][GEAR].push(
+                    BPPoolResults[RARE_BOX][COMMON][GEAR][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[RARE_BOX][COMMON][DRO] = [
+        BPPoolPercent[RARE_BOX][COMMON][DRO] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[RARE_BOX][COMMON][DRO] = [1, 2, 3, 4];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][COMMON][DRO].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][COMMON][DRO][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][COMMON][DRO].push(
+                    BPPoolResults[RARE_BOX][COMMON][DRO][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[RARE_BOX][COMMON][SUITE] = [
+        BPPoolPercent[RARE_BOX][COMMON][SUITE] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][COMMON][SUITE] = [0, 1, 2];
 
-        BPPoolPercentage[RARE_BOX][COMMON][BOT] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][COMMON][SUITE].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[RARE_BOX][COMMON][SUITE][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][COMMON][SUITE].push(
+                    BPPoolResults[RARE_BOX][COMMON][SUITE][p]
+                );
+            }
+        }
+
+        BPPoolPercent[RARE_BOX][COMMON][BOT] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[RARE_BOX][COMMON][BOT] = [1, 2, 3, 4];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][COMMON][BOT].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][COMMON][BOT][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][COMMON][BOT].push(
+                    BPPoolResults[RARE_BOX][COMMON][BOT][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[RARE_BOX][COMMON][WEAP] = [
+        BPPoolPercent[RARE_BOX][COMMON][WEAP] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[RARE_BOX][COMMON][WEAP] = [0, 1, 2, 3];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][COMMON][WEAP].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 *
+                BPPoolPercent[RARE_BOX][COMMON][WEAP][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][COMMON][WEAP].push(
+                    BPPoolResults[RARE_BOX][COMMON][WEAP][p]
+                );
+            }
+        }
 
         //RARE
-        BPPoolPercentage[RARE_BOX][RARE][GEAR] = [
+        BPPoolPercent[RARE_BOX][RARE][GEAR] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][RARE][GEAR] = [5, 6, 7];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][RARE][GEAR].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][RARE][GEAR][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][RARE][GEAR].push(
+                    BPPoolResults[RARE_BOX][RARE][GEAR][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[RARE_BOX][RARE][DRO] = [
+        BPPoolPercent[RARE_BOX][RARE][DRO] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][RARE][DRO] = [5, 6, 7];
+        for (uint16 p = 0; p < BPPoolPercent[RARE_BOX][RARE][DRO].length; p++) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][RARE][DRO][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][RARE][DRO].push(
+                    BPPoolResults[RARE_BOX][RARE][DRO][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[RARE_BOX][RARE][SUITE] = [
+        BPPoolPercent[RARE_BOX][RARE][SUITE] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][RARE][SUITE] = [3, 4, 5];
 
-        BPPoolPercentage[RARE_BOX][RARE][BOT] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][RARE][SUITE].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][RARE][SUITE][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][RARE][SUITE].push(
+                    BPPoolResults[RARE_BOX][RARE][SUITE][p]
+                );
+            }
+        }
+
+        BPPoolPercent[RARE_BOX][RARE][BOT] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][RARE][BOT] = [5, 6, 7];
 
-        BPPoolPercentage[RARE_BOX][RARE][WEAP] = [
+        for (uint16 p = 0; p < BPPoolPercent[RARE_BOX][RARE][BOT].length; p++) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][RARE][BOT][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][RARE][BOT].push(
+                    BPPoolResults[RARE_BOX][RARE][BOT][p]
+                );
+            }
+        }
+
+        BPPoolPercent[RARE_BOX][RARE][WEAP] = [
             uint256(2000),
             uint256(2000),
             uint256(2000),
@@ -355,37 +623,92 @@ contract RandomRate is Ownable {
         ];
         BPPoolResults[RARE_BOX][RARE][WEAP] = [4, 5, 6, 7, 8];
 
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][RARE][WEAP].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][RARE][WEAP][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][RARE][WEAP].push(
+                    BPPoolResults[RARE_BOX][RARE][WEAP][p]
+                );
+            }
+        }
+
         //EPIC
-        BPPoolPercentage[RARE_BOX][EPIC][GEAR] = [
+        BPPoolPercent[RARE_BOX][EPIC][GEAR] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][EPIC][GEAR] = [8, 9, 10];
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][EPIC][GEAR].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][EPIC][GEAR][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][EPIC][GEAR].push(
+                    BPPoolResults[RARE_BOX][EPIC][GEAR][p]
+                );
+            }
+        }
 
-        BPPoolPercentage[RARE_BOX][EPIC][DRO] = [
+        BPPoolPercent[RARE_BOX][EPIC][DRO] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][EPIC][DRO] = [8, 9, 10];
-
-        BPPoolPercentage[RARE_BOX][EPIC][SUITE] = [
+        for (uint16 p = 0; p < BPPoolPercent[RARE_BOX][EPIC][DRO].length; p++) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][EPIC][DRO][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][EPIC][DRO].push(
+                    BPPoolResults[RARE_BOX][EPIC][DRO][p]
+                );
+            }
+        }
+        BPPoolPercent[RARE_BOX][EPIC][SUITE] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[RARE_BOX][EPIC][SUITE] = [6, 7, 8, 9];
-
-        BPPoolPercentage[RARE_BOX][EPIC][BOT] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][EPIC][SUITE].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][EPIC][SUITE][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][EPIC][SUITE].push(
+                    BPPoolResults[RARE_BOX][EPIC][SUITE][p]
+                );
+            }
+        }
+        BPPoolPercent[RARE_BOX][EPIC][BOT] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[RARE_BOX][EPIC][BOT] = [8, 9, 10];
-
-        BPPoolPercentage[RARE_BOX][EPIC][WEAP] = [
+        for (uint16 p = 0; p < BPPoolPercent[RARE_BOX][EPIC][BOT].length; p++) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][EPIC][BOT][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][EPIC][BOT].push(
+                    BPPoolResults[RARE_BOX][EPIC][BOT][p]
+                );
+            }
+        }
+        BPPoolPercent[RARE_BOX][EPIC][WEAP] = [
             uint256(1600),
             uint256(1600),
             uint256(1600),
@@ -393,7 +716,19 @@ contract RandomRate is Ownable {
             uint256(1600)
         ];
         BPPoolResults[RARE_BOX][EPIC][WEAP] = [9, 10, 11, 12, 13, 14];
-
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[RARE_BOX][EPIC][WEAP].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[RARE_BOX][EPIC][WEAP][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[RARE_BOX][EPIC][WEAP].push(
+                    BPPoolResults[RARE_BOX][EPIC][WEAP][p]
+                );
+            }
+        }
         //SW
         SWPoolResults[TRANING_CAMP][RARE_BOX] = [0, 1, 2, 3, 4];
         SWPoolPercentage[TRANING_CAMP][RARE_BOX] = [
@@ -532,18 +867,26 @@ contract RandomRate is Ownable {
         //-----------------END RARE BOX RATE --------------------------------
 
         //-----------------START EPIC BOX RATE --------------------------------
-        rateResults[EPIC_BOX] = [
+        NFTPoolResults[EPIC_BOX] = [
             BLUEPRINT_EPIC,
             GENOMIC_RARE,
             GENOMIC_EPIC,
             SPACE_WARRIOR
         ];
-        percentage[EPIC_BOX] = [
+        NFTPoolPercentage[EPIC_BOX] = [
             uint256(1000),
             uint256(1000),
             uint256(1000),
             uint256(7000)
         ];
+
+        //Assign mapping
+        for (uint16 p = 0; p < NFTPoolPercentage[EPIC_BOX].length; p++) {
+            uint256 qtyItem = (1000 * NFTPoolPercentage[EPIC_BOX][p]) / 10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                NFTPoolValues[EPIC_BOX].push(NFTPoolResults[EPIC_BOX][p]);
+            }
+        }
 
         GenPoolPercentage[EPIC_BOX][RARE] = [7, 8, 9, 10, 11, 12];
         GenPoolPercentage[EPIC_BOX][RARE] = [
@@ -564,36 +907,76 @@ contract RandomRate is Ownable {
         ];
 
         //EPIC
-        BPPoolPercentage[EPIC_BOX][EPIC][GEAR] = [
+        BPPoolPercent[EPIC_BOX][EPIC][GEAR] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[EPIC_BOX][EPIC][GEAR] = [8, 9, 10];
-
-        BPPoolPercentage[EPIC_BOX][EPIC][DRO] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[EPIC_BOX][EPIC][GEAR].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[EPIC_BOX][EPIC][GEAR][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[EPIC_BOX][EPIC][GEAR].push(
+                    BPPoolResults[EPIC_BOX][EPIC][GEAR][p]
+                );
+            }
+        }
+        BPPoolPercent[EPIC_BOX][EPIC][DRO] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[EPIC_BOX][EPIC][DRO] = [8, 9, 10];
-
-        BPPoolPercentage[EPIC_BOX][EPIC][SUITE] = [
+        for (uint16 p = 0; p < BPPoolPercent[EPIC_BOX][EPIC][DRO].length; p++) {
+            uint256 qtyItem = (1000 * BPPoolPercent[EPIC_BOX][EPIC][DRO][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[EPIC_BOX][EPIC][DRO].push(
+                    BPPoolResults[EPIC_BOX][EPIC][DRO][p]
+                );
+            }
+        }
+        BPPoolPercent[EPIC_BOX][EPIC][SUITE] = [
             uint256(2500),
             uint256(2500),
             uint256(2500),
             uint256(2500)
         ];
         BPPoolResults[EPIC_BOX][EPIC][SUITE] = [6, 7, 8, 9];
-
-        BPPoolPercentage[EPIC_BOX][EPIC][BOT] = [
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[EPIC_BOX][EPIC][SUITE].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[EPIC_BOX][EPIC][SUITE][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[EPIC_BOX][EPIC][SUITE].push(
+                    BPPoolResults[EPIC_BOX][EPIC][SUITE][p]
+                );
+            }
+        }
+        BPPoolPercent[EPIC_BOX][EPIC][BOT] = [
             uint256(3300),
             uint256(3300),
             uint256(3300)
         ];
         BPPoolResults[EPIC_BOX][EPIC][BOT] = [8, 9, 10];
-
-        BPPoolPercentage[EPIC_BOX][EPIC][WEAP] = [
+        for (uint16 p = 0; p < BPPoolPercent[EPIC_BOX][EPIC][BOT].length; p++) {
+            uint256 qtyItem = (1000 * BPPoolPercent[EPIC_BOX][EPIC][BOT][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[EPIC_BOX][EPIC][BOT].push(
+                    BPPoolResults[EPIC_BOX][EPIC][BOT][p]
+                );
+            }
+        }
+        BPPoolPercent[EPIC_BOX][EPIC][WEAP] = [
             uint256(1600),
             uint256(1600),
             uint256(1600),
@@ -601,7 +984,19 @@ contract RandomRate is Ownable {
             uint256(1600)
         ];
         BPPoolResults[EPIC_BOX][EPIC][WEAP] = [9, 10, 11, 12, 13, 14];
-
+        for (
+            uint16 p = 0;
+            p < BPPoolPercent[EPIC_BOX][EPIC][WEAP].length;
+            p++
+        ) {
+            uint256 qtyItem = (1000 * BPPoolPercent[EPIC_BOX][EPIC][WEAP][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                BPPoolValues[EPIC_BOX][EPIC][WEAP].push(
+                    BPPoolResults[EPIC_BOX][EPIC][WEAP][p]
+                );
+            }
+        }
         //SW
         SWPoolResults[TRANING_CAMP][EPIC_BOX] = [0, 1, 2, 3, 4];
         SWPoolPercentage[TRANING_CAMP][EPIC_BOX] = [
@@ -749,8 +1144,17 @@ contract RandomRate is Ownable {
 
         //-----------------START SPECIAL BOX RATE --------------------------------
 
-        rateResults[SPECIAL_BOX] = [SPACE_WARRIOR];
-        percentage[SPECIAL_BOX] = [uint256(10000)];
+        NFTPoolResults[SPECIAL_BOX] = [SPACE_WARRIOR];
+        NFTPoolPercentage[SPECIAL_BOX] = [uint256(10000)];
+
+        //Assign mapping
+        for (uint16 p = 0; p < NFTPoolPercentage[SPECIAL_BOX].length; p++) {
+            uint256 qtyItem = (1000 * NFTPoolPercentage[SPECIAL_BOX][p]) /
+                10000;
+            for (uint16 i = 0; i < qtyItem; i++) {
+                NFTPoolValues[SPECIAL_BOX].push(NFTPoolResults[SPECIAL_BOX][p]);
+            }
+        }
 
         SWPoolResults[TRANING_CAMP][SPECIAL_BOX] = [0, 1, 2, 3, 4];
         SWPoolPercentage[TRANING_CAMP][SPECIAL_BOX] = [
@@ -912,31 +1316,9 @@ contract RandomRate is Ownable {
         view
         returns (uint16)
     {
-        uint16 amount = 100;
-        uint16 count = 0;
-        uint16 index = 0;
- 
-        for (uint16 p = 0; p < percentage[_nftType].length; p++) {
-            uint256 qtyItem = (amount * percentage[_nftType][p]) / 10000;
-            for (uint16 i = 0; i < qtyItem; i++) {
-                count++;
-            }
-        }
-
-        uint16 _modNumber = uint16(_number) % count;
-
-        for (uint16 p = 0; p < percentage[_nftType].length; p++) {
-            uint256 qtyItem = (amount * percentage[_nftType][p]) / 10000;
-            for (uint16 i = 0; i < qtyItem; i++) {
-                if (_modNumber == index) {
-                    return rateResults[_nftType][p];
-                }
-
-                index++;
-            }
-        }
-
-        return 0;
+        // return uint16(NFTPoolValues[_nftType].length);
+        uint16 _modNumber = _number % uint16(NFTPoolValues[_nftType].length);
+        return uint16(NFTPoolValues[_nftType][_modNumber]);
     }
 
     function getEquipmentPool(uint16 _number) public view returns (uint16) {
@@ -949,40 +1331,9 @@ contract RandomRate is Ownable {
         uint16 eTypeId,
         uint16 _number
     ) public view returns (uint16) {
-        uint16 amount = 100;
-        uint16 index = 0;
-        uint16 count = 0;
-        for (
-            uint16 p = 0;
-            p < BPPoolPercentage[_nftType][_rarity][eTypeId].length;
-            p++
-        ) {
-            uint256 qtyItem = (amount *
-                BPPoolPercentage[_nftType][_rarity][eTypeId][p]) / 10000;
-            for (uint16 i = 0; i < qtyItem; i++) {
-                count++;
-            }
-        }
-
-        uint16 _modNumber = uint16(_number) % count;
-
-        for (
-            uint16 p = 0;
-            p < BPPoolPercentage[_nftType][_rarity][eTypeId].length;
-            p++
-        ) {
-            uint256 qtyItem = (amount *
-                BPPoolPercentage[_nftType][_rarity][eTypeId][p]) / 10000;
-            for (uint16 i = 0; i < qtyItem; i++) {
-                if (_modNumber == index) {
-                    return BPPoolResults[_nftType][_rarity][eTypeId][p];
-                }
-
-                index++;
-            }
-        }
-
-        return 0;
+        uint16 _modNumber = uint16(_number) %
+            uint16(BPPoolValues[_nftType][_rarity][eTypeId].length);
+        return uint16(BPPoolValues[_nftType][_rarity][eTypeId][_modNumber]);
     }
 
     function getSpaceWarriorPool(
