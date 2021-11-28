@@ -76,20 +76,21 @@ contract BoxRedemption is Ownable {
     uint8 private constant COMMON = 0;
     uint8 private constant RARE = 1;
     uint8 private constant EPIC = 2;
+    uint8 private constant SPACIAL = 3;
 
     mapping(uint256 => address) ranNumToSender;
     mapping(uint256 => uint256) requestToNFTId;
 
     event OpenBox(address _by, uint256 _nftId, string partCode);
-    event ChangeRandomRateContract(address _address);
+    event ChangeRandomRateContract(uint256 _nftType ,address _address);
     event ChangeMysteryBoxContract(address _address);
     event ChangeNftCoreContract(address _address);
     event ChangeRandomWorkerContract(address _address);
 
-    RANDOM_RATE randomRate;
     address public mysteryBoxContract;
     address public nftCoreContract;
     address public randomWorkerContract;
+    mapping(uint256 => address) public randomRateAddress;
 
     constructor() {}
 
@@ -108,9 +109,24 @@ contract BoxRedemption is Ownable {
         emit ChangeNftCoreContract(_address);
     }
 
-    function changeRandomRate(address _address) public onlyOwner {
-        randomRate = RANDOM_RATE(_address);
-        emit ChangeRandomRateContract(_address);
+    function changeRandomRateCommonBox(address _address) public onlyOwner {
+        randomRateAddress[COMMON] = _address;
+        emit ChangeRandomRateContract(COMMON, _address);
+    }
+
+    function changeRandomRateRareBox(address _address) public onlyOwner {
+        randomRateAddress[RARE] = _address;
+        emit ChangeRandomRateContract(RARE, _address);
+    }
+
+    function changeRandomRateEpicBox(address _address) public onlyOwner {
+        randomRateAddress[EPIC] = _address;
+        emit ChangeRandomRateContract(EPIC,_address);
+    }
+
+    function changeRandomRateSpacialBox(address _address) public onlyOwner {
+        randomRateAddress[SPACIAL] = _address;
+        emit ChangeRandomRateContract(SPACIAL, _address);
     }
 
     function burnAndMint(
@@ -140,13 +156,13 @@ contract BoxRedemption is Ownable {
     }
 
     function createGenomic(
-        uint16 _id,
+        uint16 _nftType,
         uint16 _nftTypeCode,
         uint16 _number,
         uint16 _rarity
     ) private view returns (string memory) {
         //uint256 genomicType = GenPool[_id][_rarity][_number];
-        uint16 genomicType = randomRate.getGenPool(_id, _rarity, _number);
+        uint16 genomicType = RANDOM_RATE(randomRateAddress[_nftType]).getGenPool(_nftType, _rarity, _number);
         return
             createPartCode(
                 0,
@@ -170,11 +186,11 @@ contract BoxRedemption is Ownable {
     {
         string memory partCode;
         uint16 randomNumberForNFTType = getNumberAndMod(_randomNumber, 1, 1000);
-        uint16 nftTypeCode = randomRate.getNFTPool(_nftType, randomNumberForNFTType);
+        uint16 nftTypeCode = RANDOM_RATE(randomRateAddress[_nftType]).getNFTPool(_nftType, randomNumberForNFTType);
 
         uint16 equipmentRandom = getNumberAndMod(_randomNumber, 2, 5);
         uint16 index = getNumberAndMod(_randomNumber, 3, 1000);
-        uint16 eTypeId = randomRate.getEquipmentPool(equipmentRandom);
+        uint16 eTypeId = RANDOM_RATE(randomRateAddress[_nftType]).getEquipmentPool(equipmentRandom);
         
         if (nftTypeCode == GENOMIC_COMMON) { //GENOMIC_COMMON
             partCode = createGenomic(_nftType, nftTypeCode, index, COMMON);
@@ -186,7 +202,7 @@ contract BoxRedemption is Ownable {
             partCode = createGenomic(_nftType, nftTypeCode, index, EPIC);
 
         } else if (nftTypeCode == BLUEPRINT_COMM) { //BLUEPRINT_COMM
-            uint16 ePartId = randomRate.getBlueprintPool(
+            uint16 ePartId = RANDOM_RATE(randomRateAddress[_nftType]).getBlueprintPool(
                 _nftType,
                 COMMON,
                 eTypeId,
@@ -195,7 +211,7 @@ contract BoxRedemption is Ownable {
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
             
         } else if (nftTypeCode == BLUEPRINT_RARE) { //BLUEPRINT_RARE
-            uint16 ePartId = randomRate.getBlueprintPool(
+            uint16 ePartId = RANDOM_RATE(randomRateAddress[_nftType]).getBlueprintPool(
                 _nftType,
                 RARE,
                 eTypeId,
@@ -204,7 +220,7 @@ contract BoxRedemption is Ownable {
             partCode = createBlueprintPartCode(nftTypeCode, eTypeId, ePartId);
 
         } else if (nftTypeCode == BLUEPRINT_EPIC) { //BLUEPRINT_EPIC
-            uint16 ePartId = randomRate.getBlueprintPool(
+            uint16 ePartId = RANDOM_RATE(randomRateAddress[_nftType]).getBlueprintPool(
                 _nftType,
                 EPIC,
                 eTypeId,
@@ -263,31 +279,31 @@ contract BoxRedemption is Ownable {
         concatedCode = concateCode(concatedCode, 0); //kingdomCode
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(TRANING_CAMP, _nftType, trainingId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(TRANING_CAMP, _nftType, trainingId)
         );
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(GEAR, _nftType, battleGearId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(GEAR, _nftType, battleGearId)
         );
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(DRO, _nftType, battleDroneId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(DRO, _nftType, battleDroneId)
         );
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(SUITE, _nftType, battleSuiteId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(SUITE, _nftType, battleSuiteId)
         );
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(BOT, _nftType, battleBotId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(BOT, _nftType, battleBotId)
         );
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(GEN, _nftType, humanGenomeId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(GEN, _nftType, humanGenomeId)
         );
         concatedCode = concateCode(
             concatedCode,
-            randomRate.getSpaceWarriorPool(WEAP, _nftType, weaponId)
+            RANDOM_RATE(randomRateAddress[_nftType]).getSpaceWarriorPool(WEAP, _nftType, weaponId)
         );
         concatedCode = concateCode(concatedCode, 0); //Star
         concatedCode = concateCode(concatedCode, 0); //equipmentCode

@@ -43,7 +43,8 @@ const apiKey = fs.readFileSync(".apiKey").toString().trim()
    version: "0.8.3",
    settings: {
      optimizer: {
-       enabled: true
+       enabled: true,
+       runs: 1000,
      }
     }
    },

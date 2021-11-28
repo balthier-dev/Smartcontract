@@ -13,8 +13,10 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
   //
-  let contracts = ["MysteryBox", "ECIONFTCore", "BoxRedemption", "RandomRate"];
-
+  let contracts = ["MysteryBox", "ECIONFTCore", 
+  "BoxRedemption", "RandomRate","RandomWorker",
+  "RandomRateCommonBox","RandomRateEpicBox","RandomRateRareBox", "RandomRateSpacialBox"];
+ contracts = ["BoxRedemption", "RandomRateCommonBox","RandomRateEpicBox","RandomRateRareBox", "RandomRateSpacialBox" ];
   for (let i = 0; i < contracts.length; i++) {
     const name = contracts[i];
     const contract = await hre.ethers.getContractFactory(name);
