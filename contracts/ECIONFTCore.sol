@@ -19,27 +19,25 @@ contract ECIONFTCore is
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant ADMIN_A_ROLE = keccak256("ADMIN_A");
-    bytes32 public constant ADMIN_B_ROLE = keccak256("ADMIN_B");
-
+    bytes32 public constant DEV_ROLE = keccak256("DEV_ROLE");
+    
     CountersUpgradeable.Counter private tokenIdCounter;
     mapping(uint256 => uint256) private createdAt;
     mapping(uint256 => string) private partCodes;
     mapping(address => bool) public operators;
 
     function initialize() public initializer {
-        __ERC721_init("ECIO NFT Core", "ECIO");
+        __ERC721_init("ECIO Space NFT", "ECIO");
         __ERC721Burnable_init();
         __AccessControl_init();
         __ERC721URIStorage_init();
 
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
-        _setupRole(ADMIN_A_ROLE, msg.sender);
-        _setupRole(ADMIN_B_ROLE, msg.sender);
-
-        //start tokenId at 3000
-        for (uint256 i = 0; i < 3000; i++) {
+        _setupRole(DEV_ROLE, msg.sender);
+ 
+        //start tokenId at 5000
+        for (uint256 i = 0; i < 5000; i++) {
              tokenIdCounter.increment();
         }
     }
@@ -51,14 +49,14 @@ contract ECIONFTCore is
 
     function addOperatorAddress(address _address)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(DEV_ROLE)
     {
         operators[_address] = true;
     }
 
     function removeOperatorAddress(address _address)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(DEV_ROLE)
     {
         operators[_address] = false;
     }
@@ -81,7 +79,7 @@ contract ECIONFTCore is
         string memory _partCode,
         uint256 _tokenId,
         uint256 _createdAt
-    ) public onlyRole(MINTER_ROLE) {
+    ) public onlyRole(DEV_ROLE) {
         _safeMint(_to, _tokenId);
         partCodes[_tokenId] = _partCode;
         createdAt[_tokenId] = _createdAt;
