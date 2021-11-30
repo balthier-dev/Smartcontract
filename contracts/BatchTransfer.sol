@@ -4,8 +4,9 @@ pragma solidity ^0.8.2;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
-contract BatchTransfer is Ownable {
+contract BatchTransfer is Ownable, ERC1155Holder {
     constructor() {}
 
     event TransferToUsers(
@@ -21,6 +22,10 @@ contract BatchTransfer is Ownable {
         uint256[] memory nftIds,
         uint256[] memory amount
     ) public onlyOwner {
+        require(
+            accounts.length == nftIds.length && accounts.length == amount.length,
+            "Invalid array data!"
+        );
         for (uint256 i = 0; i < accounts.length; i++) {
             ERC1155(nftAddress).safeTransferFrom(
                 address(this),
