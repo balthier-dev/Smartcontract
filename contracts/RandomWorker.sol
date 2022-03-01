@@ -19,13 +19,19 @@ contract RandomWorker is VRFConsumerBase, Ownable {
     //     0xa555fC018435bef5A13C6c6870a9d4C11DEC329C,
     //     0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06
     // )
+
+    //mainnet
+        //     VRFConsumerBase(
+        //     0x747973a5A2a4Ae1D3a8fDF5479f1514F65Db9C31, // VRF Coordinator
+        //     0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD // LINK Token
+        // )
     bool public isMock;
 
     constructor()
         VRFConsumerBase(
-            0x747973a5A2a4Ae1D3a8fDF5479f1514F65Db9C31, // VRF Coordinator
-            0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD // LINK Token
-        )
+        0xa555fC018435bef5A13C6c6870a9d4C11DEC329C,
+        0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06
+     )
     {
         count = 0;
         keyHash = 0xc251acd21ec4fb7f31bb8868288bfdbaeb4fbfec2df3735ddbd4f7dc8d60103c;

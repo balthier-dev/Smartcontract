@@ -17,7 +17,7 @@ async function main() {
   "BoxRedemption", "RandomRate","RandomWorker",
   "RandomRateCommonBox","RandomRateEpicBox","RandomRateRareBox", "RandomRateSpacialBox"];
 //  contracts = ["BoxRedemption", "RandomRateCommonBox","RandomRateEpicBox","RandomRateRareBox", "RandomRateSpacialBox" ];
- contracts = ["RandomWorker"]
+ contracts = ["BattleLabsCore"]
   for (let i = 0; i < contracts.length; i++) {
     const name = contracts[i];
     const contract = await hre.ethers.getContractFactory(name);
